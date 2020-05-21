@@ -47,9 +47,39 @@ public class PracticalTest02MainActivity extends AppCompatActivity {
             serverThread.start();
         }
     }
+    private SetButtonClickListener setButtonClickListener = new SetButtonClickListener();
+    private class SetButtonClickListener implements Button.OnClickListener {
+        @Override
+        public void onClick(View view) {
+            String clientAddress = clientAddressEditText.getText().toString();
+            String clientPort = clientPortEditText.getText().toString();
+            if (clientAddress == null || clientAddress.isEmpty()
+                    || clientPort == null || clientPort.isEmpty()) {
+                Toast.makeText(getApplicationContext(), "[MAIN ACTIVITY] Client connection parameters should be filled!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (serverThread == null || !serverThread.isAlive()) {
+                Toast.makeText(getApplicationContext(), "[MAIN ACTIVITY] There is no server to connect to!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            String hours = oraEditText.getText().toString();
+            String minutes = minutEditText.getText().toString();
+            if (hours == null || hours.isEmpty() || minutes == null || minutes.isEmpty()) {
+                Toast.makeText(getApplicationContext(), "[MAIN ACTIVITY] Parameters from client (hours / minutes type) should be filled", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            dataTextView.setText(Constants.EMPTY_STRING);
 
-    private GetDataButtonClickListener getDataButtonClickListener = new GetDataButtonClickListener();
-    private class GetDataButtonClickListener implements Button.OnClickListener {
+            String request = "set," + hours + "," + minutes + "\n";
+            clientThread = new ClientThread(
+                    clientAddress, Integer.parseInt(clientPort), request, dataTextView
+            );
+            clientThread.start();
+        }
+    }
+
+    private ResetButtonClickListener resetButtonClickListener = new ResetButtonClickListener();
+    private class ResetButtonClickListener implements Button.OnClickListener {
         @Override
         public void onClick(View view) {
             String clientAddress = clientAddressEditText.getText().toString();
@@ -64,14 +94,42 @@ public class PracticalTest02MainActivity extends AppCompatActivity {
                 return;
             }
 
+            dataTextView.setText(Constants.EMPTY_STRING);
 
+            String request = "reset\n";
             clientThread = new ClientThread(
-                    clientAddress, Integer.parseInt(clientPort)
+                    clientAddress, Integer.parseInt(clientPort), request, dataTextView
             );
             clientThread.start();
         }
-
     }
+
+    private PollButtonClickListener pollButtonClickListener = new PollButtonClickListener();
+    private class PollButtonClickListener implements Button.OnClickListener {
+        @Override
+        public void onClick(View view) {
+            String clientAddress = clientAddressEditText.getText().toString();
+            String clientPort = clientPortEditText.getText().toString();
+            if (clientAddress == null || clientAddress.isEmpty()
+                    || clientPort == null || clientPort.isEmpty()) {
+                Toast.makeText(getApplicationContext(), "[MAIN ACTIVITY] Client connection parameters should be filled!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (serverThread == null || !serverThread.isAlive()) {
+                Toast.makeText(getApplicationContext(), "[MAIN ACTIVITY] There is no server to connect to!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            dataTextView.setText(Constants.EMPTY_STRING);
+
+            String request = "poll\n";
+            clientThread = new ClientThread(
+                    clientAddress, Integer.parseInt(clientPort), request, dataTextView
+            );
+            clientThread.start();
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -90,6 +148,8 @@ public class PracticalTest02MainActivity extends AppCompatActivity {
         dataTextView = (TextView)findViewById(R.id.data_text_view);
 
         connectButton.setOnClickListener(connectButtonClickListener);
-//        getDataButton.setOnClickListener(getDataButtonClickListener);
+        setButton.setOnClickListener(setButtonClickListener);
+        resetButton.setOnClickListener(resetButtonClickListener);
+        pollButton.setOnClickListener(pollButtonClickListener);
     }
 }
