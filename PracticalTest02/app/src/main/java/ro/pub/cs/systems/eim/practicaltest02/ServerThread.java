@@ -12,7 +12,7 @@ import cz.msebera.android.httpclient.client.ClientProtocolException;
 public class ServerThread extends Thread{
     private int port = 0;
     private ServerSocket serverSocket = null;
-    private HashMap<String, String> data = null;
+    private HashMap<String, AlarmInformation> data = null;
 
     public ServerThread(int port) {
         this.port = port;
@@ -43,11 +43,11 @@ public class ServerThread extends Thread{
         return serverSocket;
     }
 
-    public synchronized void setData(String h, String m) {
-        this.data.put(h, m);
+    public synchronized void setData(String data, AlarmInformation alarmInformation) {
+        this.data.put(data, alarmInformation);
     }
 
-    public synchronized HashMap<String, String> getData() {
+    public synchronized HashMap<String, AlarmInformation> getData() {
         return data;
     }
 
